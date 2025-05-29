@@ -33,6 +33,59 @@
 	<a href="https://trendshift.io/repositories/12122" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12122" alt="browserbase%2Fstagehand | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </p>
 
+## 🦙 Ollama Integration
+
+This fork adds complete **Ollama support** to Stagehand, enabling local LLM automation with structured outputs.
+
+### Key Features
+
+- **Official Ollama Client**: Built on the official [`ollama`](https://www.npmjs.com/package/ollama) npm package for maximum compatibility
+- **Structured Outputs**: Full JSON schema support using Zod types for reliable data extraction
+- **Vision Models**: Support for multi-modal models like LLaVA and BakLLaVA
+
+### Quick Start
+
+```typescript
+const stagehand = new Stagehand({
+  env: "LOCAL",
+  modelName: "ollama/llama3.2:latest", // Use ollama/ prefix
+  modelClientOptions: {
+    baseURL: "http://localhost:11434", // Your Ollama server
+  },
+});
+```
+
+### Why the Official Package?
+
+We use the official [`ollama`](https://www.npmjs.com/package/ollama) package instead of custom HTTP clients:
+
+- **Type Safety**: Leverages official TypeScript types (`ChatRequest`, `ChatResponse`, `Options`)
+- **API Compatibility**: Automatically stays compatible with Ollama API changes
+- **Reliability**: Battle-tested HTTP handling, connection management, and error handling
+- **Future-Proof**: New Ollama features (like tool calling) work immediately
+- **Less Maintenance**: No need to maintain custom API client code
+
+The `OllamaClient` acts as a bridge between Stagehand's `LLMClient` interface and the official Ollama package, handling message format conversion, schema validation, and response transformation automatically.
+
+### Recommended Model: Qwen2.5-7B-Instruct-1M
+
+This integration is optimized for **Qwen2.5-7B-Instruct-1M**, which provides exceptional performance for browser automation tasks:
+
+```bash
+# Install the recommended model
+ollama pull yasserrmd/Qwen2.5-7B-Instruct-1M:latest
+```
+
+**Why Qwen2.5-7B-Instruct-1M?**
+
+- **Ultra-Long Context**: 1,010,000 token context window handles complex web pages and extensive DOM trees without truncation
+- **Structured Output Excellence**: Superior JSON schema adherence for reliable data extraction from web content
+- **Instruction Following**: Fine-tuned specifically for instruction-following tasks, ideal for Stagehand's `observe()`, `act()`, and `extract()` operations
+- **Efficient Architecture**: 7.61B parameters with sparse attention for optimal speed-to-quality ratio
+- **Web Content Understanding**: Excellent performance on HTML/DOM analysis and element identification
+
+The extended context length is particularly valuable for processing large accessibility trees from modern web applications, while the model's structured output capabilities ensure reliable job data extraction and form interaction.
+
 ## Why Stagehand?
 
 Most existing browser automation tools either require you to write low-level code in a framework like Selenium, Playwright, or Puppeteer, or use high-level agents that can be unpredictable in production. By letting developers choose what to write in code vs. natural language, Stagehand is the natural choice for browser automations in production.
@@ -63,8 +116,8 @@ await page.act("click on the stagehand repo");
 
 // Use Computer Use agents for larger actions
 const agent = stagehand.agent({
-    provider: "openai",
-    model: "computer-use-preview",
+  provider: "openai",
+  model: "computer-use-preview",
 });
 await agent.execute("Get to the latest PR");
 
@@ -132,6 +185,7 @@ For more information, please see our [Contributing Guide](https://docs.stagehand
 This project heavily relies on [Playwright](https://playwright.dev/) as a resilient backbone to automate the web. It also would not be possible without the awesome techniques and discoveries made by [tarsier](https://github.com/reworkd/tarsier), [gemini-zod](https://github.com/jbeoris/gemini-zod), and [fuji-web](https://github.com/normal-computing/fuji-web).
 
 We'd like to thank the following people for their major contributions to Stagehand:
+
 - [Paul Klein](https://github.com/pkiv)
 - [Anirudh Kamath](https://github.com/kamath)
 - [Sean McGuire](https://github.com/seanmcguire12)

@@ -30,6 +30,7 @@ import { deepseek, createDeepSeek } from "@ai-sdk/deepseek";
 import { perplexity, createPerplexity } from "@ai-sdk/perplexity";
 import { ollama } from "ollama-ai-provider";
 import { AISDKProvider, AISDKCustomProvider } from "@/types/llm";
+import { OllamaClient } from "./OllamaClient";
 
 const AISDKProviders: Record<string, AISDKProvider> = {
   openai,
@@ -160,6 +161,17 @@ export class LLMProvider {
       const firstSlashIndex = modelName.indexOf("/");
       const subProvider = modelName.substring(0, firstSlashIndex);
       const subModelName = modelName.substring(firstSlashIndex + 1);
+
+      // Use our custom OllamaClient for better structured output support
+      if (subProvider === "ollama") {
+        return new OllamaClient({
+          logger: this.logger,
+          enableCaching: this.enableCaching,
+          cache: this.cache,
+          modelName: subModelName,
+          clientOptions,
+        });
+      }
 
       const languageModel = getAISDKLanguageModel(
         subProvider,
